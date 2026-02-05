@@ -1,0 +1,67 @@
+version: 0.2
+
+# Pipeline 1: Deploy Infrastructure as Code
+# This buildspec deploys the Terraform infrastructure
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing Terraform and security scanning tools..."
+      - wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip
+      - unzip terraform_1.6.0_linux_amd64.zip
+      - mv terraform /usr/local/bin/
+      - terraform --version
+      
+      # Install Checkov for IaC scanning
+      - pip3 install checkov
+      
+      # Install tfsec for Terraform security scanning
+      - wget -q https://github.com/aquasecurity/tfsec/releases/download/v1.28.1/tfsec-linux-amd64
+      - chmod +x tfsec-linux-amd64
+      - mv tfsec-linux-amd64 /usr/local/bin/tfsec
+
+  pre_build:
+    commands:
+      - echo "Scanning Terraform code for security issues..."
+      - cd terraform
+      
+      # Run Checkov scan
+      - echo "Running Checkov IaC security scan..."
+      - checkov -d . --framework terraform --output cli --soft-fail || true
+      
+      # Run tfsec scan
+      - echo "Running tfsec Terraform security scan..."
+      - tfsec . --soft-fail || true
+      
+      - echo "Security scans complete. Proceeding with deployment..."
+
+  build:
+    commands:
+      - echo "Initializing Terraform..."
+      - terraform init
+      
+      - echo "Validating Terraform configuration..."
+      - terraform validate
+      
+      - echo "Planning Terraform changes..."
+      - terraform plan -out=tfplan
+      
+      - echo "Applying Terraform changes..."
+      - terraform apply -auto-approve tfplan
+
+  post_build:
+    commands:
+      - echo "Infrastructure deployment complete!"
+      - terraform output -json > ../terraform-outputs.json
+      - cat ../terraform-outputs.json
+
+artifacts:
+  files:
+    - terraform-outputs.json
+    - terraform/**/*
+
+cache:
+  paths:
+    - '/root/.terraform.d/**/*'
