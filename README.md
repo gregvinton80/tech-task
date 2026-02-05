@@ -14,20 +14,24 @@ This is a full-stack application featuring:
 
 ## Architecture
 
+The application follows a modern cloud-native architecture:
+
 ```
-GitHub → CodePipeline → CodeBuild → ECR → EKS
-                ↓
-         Security Scanning
-         (Checkov, Trivy, Inspector)
-                ↓
-         Security Hub / GuardDuty
+GitHub → CodePipeline → CodeBuild → ECR → EKS (Kubernetes)
+                                            ↓
+                                      MongoDB (EC2)
+                                            ↓
+                                    S3 (Automated Backups)
 ```
 
-**Components:**
-- **Application**: Go-based opportunity tracker with MongoDB
-- **Infrastructure**: AWS (VPC, EKS, EC2, S3, ECR)
-- **CI/CD**: GitHub Actions + AWS CodePipeline/CodeBuild
-- **Security**: Inspector, Security Hub, Config, CloudTrail, GuardDuty
+**Infrastructure Components:**
+- **Application**: Go microservice running in Kubernetes pods
+- **Database**: MongoDB on EC2 with automated daily backups
+- **Container Registry**: Amazon ECR for Docker images
+- **Orchestration**: Amazon EKS (Kubernetes) for container management
+- **Load Balancing**: Application Load Balancer for traffic distribution
+- **Storage**: S3 for database backups with lifecycle policies
+- **Networking**: VPC with public/private subnets for security
 
 ## Features
 
@@ -116,25 +120,21 @@ kubectl get ingress -n wiz-app
    - `IMAGE_REPO_NAME`
    - `EKS_CLUSTER_NAME`
 
-## Security Controls
+## Security
 
-### Preventative Controls
+This application implements multiple layers of security:
 
-- Branch protection rules
-- Required PR reviews
-- Automated security scanning in CI/CD
-- IaC scanning (Checkov, tfsec)
-- Container scanning (Trivy)
-- Secret scanning (Gitleaks)
-- Dependency scanning (Dependabot, govulncheck)
+- **Authentication**: JWT tokens with secure cookie storage
+- **Authorization**: User-specific data isolation
+- **Password Security**: bcrypt hashing with salt
+- **Database Security**: MongoDB authentication required
+- **Network Security**: Private subnets for application and database
+- **Container Security**: Regular vulnerability scanning
+- **Infrastructure Security**: Automated compliance checking
+- **Audit Logging**: CloudTrail for all AWS API calls
+- **Backup Strategy**: Automated daily backups to S3
 
-### Detective Controls
-
-- AWS CloudTrail (audit logging)
-- AWS Config (compliance monitoring)
-- AWS Security Hub (centralized findings)
-- Amazon Inspector (code & infrastructure scanning)
-- AWS GuardDuty (threat detection)
+See [SECURITY.md](SECURITY.md) for detailed security documentation.
 
 ## Project Structure
 
@@ -168,20 +168,29 @@ wiz/
 
 ## Demonstration
 
-See [DEMO.md](DEMO.md) for complete demonstration guide including:
-- Environment setup
-- Vulnerability demonstration
-- Security detection
-- CI/CD pipeline
-- Remediation steps
+For a complete walkthrough of the application features and deployment process, see [DEMO.md](DEMO.md).
 
 ## Application Features
 
-- User signup/login with JWT authentication
-- Track opportunities with name and value
-- CRUD operations for opportunities
-- User-specific opportunity lists
-- Clean, modern UI with Wiz branding
+### User Management
+- Secure user registration with email validation
+- Password hashing with bcrypt
+- JWT-based session management
+- Automatic session refresh
+
+### Opportunity Management
+- Create new opportunities with name and value
+- View all opportunities in a clean dashboard
+- Update opportunity details
+- Delete individual opportunities
+- Bulk delete all opportunities
+- Real-time status updates
+
+### User Experience
+- Responsive design for mobile and desktop
+- Intuitive interface with modern styling
+- Fast page loads and smooth interactions
+- Clear visual feedback for all actions
 
 ## API Endpoints
 
@@ -211,47 +220,66 @@ terraform destroy -auto-approve
 
 ## Cost Estimate
 
-Running this environment costs approximately **$5-10/day**:
-- EKS cluster: ~$0.10/hour ($2.40/day)
-- EC2 instances: ~$0.05/hour ($1.20/day)
-- NAT Gateway: ~$0.045/hour ($1.08/day)
-- ALB: ~$0.025/hour ($0.60/day)
-- Other services: ~$0.50/day
+Running this infrastructure on AWS costs approximately **$5-10/day**:
+- EKS cluster: ~$2.40/day
+- EC2 instance (t3.medium): ~$1.20/day
+- NAT Gateway: ~$1.08/day
+- Application Load Balancer: ~$0.60/day
+- S3, ECR, data transfer: ~$0.50/day
+
+Monthly cost: ~$150-300 depending on usage.
 
 ## Security Tools Used
 
-- **Checkov**: IaC security scanning
-- **tfsec**: Terraform security scanner
-- **Trivy**: Container vulnerability scanner
-- **Gitleaks**: Secret detection
-- **gosec**: Go security checker
-- **govulncheck**: Go vulnerability scanner
-- **AWS Inspector**: Code and infrastructure scanning
+- **Checkov**: Infrastructure as Code security scanning
+- **tfsec**: Terraform-specific security scanner
+- **Trivy**: Container vulnerability and secret scanning
+- **Gitleaks**: Git repository secret detection
+- **gosec**: Go source code security analyzer
+- **govulncheck**: Go vulnerability database checker
+- **AWS Inspector**: Automated security assessment
 - **AWS Security Hub**: Centralized security findings
-- **AWS GuardDuty**: Threat detection
-- **AWS Config**: Compliance monitoring
-- **AWS CloudTrail**: Audit logging
+- **AWS Config**: Configuration compliance monitoring
+- **AWS CloudTrail**: API activity logging
 
 ## Tech Stack
 
-- **Language**: Go 1.21
-- **Framework**: Gin
-- **Database**: MongoDB 4.4 (intentionally outdated)
-- **Container**: Docker
-- **Orchestration**: Kubernetes (EKS)
-- **IaC**: Terraform
-- **CI/CD**: GitHub Actions + AWS CodePipeline/CodeBuild
-- **Cloud**: AWS
+**Backend:**
+- Go 1.21
+- Gin Web Framework
+- MongoDB 4.4
+- JWT for authentication
+- bcrypt for password hashing
+
+**Infrastructure:**
+- AWS EKS (Kubernetes)
+- Amazon ECR (Container Registry)
+- Amazon EC2 (MongoDB)
+- Amazon S3 (Backups)
+- Application Load Balancer
+- Terraform (Infrastructure as Code)
+
+**CI/CD:**
+- GitHub Actions
+- AWS CodePipeline
+- AWS CodeBuild
+- Automated testing and deployment
+
+**Security:**
+- Automated security scanning
+- Container vulnerability scanning (Trivy)
+- Infrastructure scanning (Checkov, tfsec)
+- Dependency scanning
+- Secret detection
 
 ## License
 
-This project is for educational purposes only. See [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Contact
 
-For questions about this exercise: [Your Email]
-
-## Acknowledgments
-
-- Original todo app: https://github.com/dogukanozdemir/golang-todo-mongodb
-- Wiz Security for the exercise requirements
+For questions or support, please open an issue in the GitHub repository.
