@@ -1,6 +1,6 @@
-# Wiz Security Exercise - Opportunities Tracker
+# Opportunities Tracker
 
-An intentionally vulnerable cloud infrastructure for security demonstration purposes. This project showcases security detection, prevention, and remediation in a cloud-native environment.
+This project showcases security detection, prevention, and remediation in a cloud-native environment.
 
 ⚠️ **WARNING**: This environment contains intentional security vulnerabilities. **DO NOT** use in production.
 
@@ -256,4 +256,4 @@ For questions about this exercise: [Your Email]
 ## Acknowledgments
 
 - Original todo app: https://github.com/dogukanozdemir/golang-todo-mongodb
-- Wiz Security for the exercise requirements
+
