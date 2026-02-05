@@ -1,17 +1,16 @@
 # Opportunities Tracker
 
-This project showcases security detection, prevention, and remediation in a cloud-native environment.
-
-⚠️ **WARNING**: This environment contains intentional security vulnerabilities. **DO NOT** use in production.
+A cloud-native opportunity tracking application built with Go, MongoDB, and Kubernetes. Track sales opportunities, manage pipelines, and monitor deal values with a modern, responsive web interface.
 
 ## Overview
 
-This project demonstrates:
-- Intentionally vulnerable AWS infrastructure
-- Security detection with AWS native tools
-- CI/CD pipeline with security scanning
-- Kubernetes deployment with security issues
-- Remediation of security vulnerabilities
+This is a full-stack application featuring:
+- RESTful API built with Go and Gin framework
+- MongoDB database for persistent storage
+- JWT-based authentication and authorization
+- Kubernetes deployment on AWS EKS
+- Infrastructure as Code with Terraform
+- Automated CI/CD pipeline with security scanning
 
 ## Architecture
 
@@ -30,16 +29,15 @@ GitHub → CodePipeline → CodeBuild → ECR → EKS
 - **CI/CD**: GitHub Actions + AWS CodePipeline/CodeBuild
 - **Security**: Inspector, Security Hub, Config, CloudTrail, GuardDuty
 
-## Intentional Vulnerabilities
+## Features
 
-1. ⚠️ SSH exposed to 0.0.0.0/0
-2. ⚠️ Excessive IAM permissions on EC2
-3. ⚠️ Public S3 bucket with database backups
-4. ⚠️ Outdated Ubuntu 20.04 and MongoDB 4.4
-5. ⚠️ Kubernetes pods with cluster-admin role
-6. ⚠️ Hardcoded credentials in configuration
-
-See [SECURITY.md](SECURITY.md) for complete list.
+- **User Management**: Secure signup and login with JWT authentication
+- **Opportunity Tracking**: Create, read, update, and delete sales opportunities
+- **Deal Values**: Track monetary values for each opportunity
+- **Status Management**: Monitor opportunity status (open/closed)
+- **User Isolation**: Each user sees only their own opportunities
+- **Responsive UI**: Clean, modern interface that works on all devices
+- **RESTful API**: Well-documented API endpoints for integration
 
 ## Prerequisites
 
@@ -256,4 +254,4 @@ For questions about this exercise: [Your Email]
 ## Acknowledgments
 
 - Original todo app: https://github.com/dogukanozdemir/golang-todo-mongodb
-
+- Wiz Security for the exercise requirements
